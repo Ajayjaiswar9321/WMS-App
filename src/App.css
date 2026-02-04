@@ -1,0 +1,144 @@
+/* App-specific styles */
+
+/* Ensure proper mobile viewport */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+}
+
+/* Mobile container */
+.mobile-container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Login screen animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-animate {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Bottom navigation styles */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.dark .bottom-nav {
+  background: #111827;
+  border-top-color: #374151;
+}
+
+/* Screen transitions */
+.screen-enter {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Card hover effects for mobile */
+@media (hover: none) {
+  .mobile-card:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Quick action buttons */
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.dark .quick-action {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.quick-action:active {
+  transform: scale(0.95);
+  background: #f3f4f6;
+}
+
+.dark .quick-action:active {
+  background: #374151;
+}
+
+/* Form inputs mobile optimization */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* Scrollable content areas */
+.scrollable-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* Hide scrollbar */
+.scrollable-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile card */
+.mobile-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: white;
+}
+
+.dark .mobile-card {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+/* Touch-friendly buttons */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Safe area utilities */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
