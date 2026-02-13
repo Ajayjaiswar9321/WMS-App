@@ -65,8 +65,10 @@ export type DeviceStatus =
   | 'qc_passed'
   | 'qc_failed'
   | 'ready_stock'
+  | 'in_stock'
   | 'stock_out'
-  | 'dispatched';
+  | 'dispatched'
+  | 'inspected';
 
 export type DeviceGrade = 'A' | 'B' | 'C' | 'D';
 
@@ -82,6 +84,8 @@ export interface Batch {
   driverName: string;
   courierPartner: string;
   challanUrl?: string;
+  poNumber?: string;
+  poAttachmentUrl?: string;
   batchDate: string;
   notes?: string;
   deviceCount: number;
@@ -185,6 +189,10 @@ export interface Dispatch {
   trackingNumber?: string;
   courierPartner?: string;
   dispatchDate?: string;
+  poNumber?: string;
+  poAttachmentUrl?: string;
+  invoiceNumber?: string;
+  invoiceAttachmentUrl?: string;
   notes?: string;
   createdAt: string;
 }

@@ -6,7 +6,8 @@ import {
     Package,
     Search,
     CheckCircle,
-    Boxes
+    Boxes,
+    Badge
 } from 'lucide-react';
 
 export function SparesScreen() {
@@ -97,14 +98,23 @@ export function SparesScreen() {
                         <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</div>
                     </div>
 
-                    <div className="p-20 flex flex-col items-center justify-center text-center space-y-4">
-                        <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                            <Package className="w-8 h-8 text-gray-300" />
-                        </div>
-                        <div>
-                            <p className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">No devices waiting for spares</p>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">All devices have been issued required parts</p>
-                        </div>
+                    <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                        {devices.filter(d => d.status === 'waiting_spares').concat([
+                            { id: 'demo1', barcode: 'L-APP-1925', brand: 'Apple', model: 'MacBook Pro M1', serialNumber: 'SN12345', status: 'waiting_spares', category: 'Laptop', createdAt: '', updatedAt: '' }
+                        ] as any).map((device) => (
+                            <div key={device.id} className="grid grid-cols-5 p-4 items-center">
+                                <div className="text-center">
+                                    <p className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-tight">{device.model}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase">{device.barcode}</p>
+                                </div>
+                                <div className="text-center text-[10px] font-black text-gray-500 uppercase">{device.category}</div>
+                                <div className="text-center text-[10px] font-black text-gray-500 uppercase">Technician A</div>
+                                <div className="text-center text-[10px] font-black text-gray-500 uppercase">2 Days</div>
+                                <div className="text-center">
+                                    <Badge className="bg-orange-50 text-orange-600 border-none font-black text-[8px] uppercase">Waiting</Badge>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
 

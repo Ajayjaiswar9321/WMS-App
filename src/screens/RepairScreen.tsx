@@ -130,9 +130,9 @@ export function RepairScreen({ onBack }: { onBack: () => void }) {
                 </div>
                 <div>
                   <p className="font-black text-xl text-purple-900 dark:text-purple-100 leading-tight">
-                    {selectedDevice.brand} {selectedDevice.model}
+                    {selectedDevice.model}
                   </p>
-                  <p className="text-sm font-bold text-purple-700 dark:text-purple-400 mb-1">{selectedDevice.category}</p>
+                  <p className="text-sm font-bold text-purple-700 dark:text-purple-400 mb-1">{selectedDevice.brand} • {selectedDevice.barcode}</p>
                   <Badge className={`${getStatusColor(selectedDevice.status)} shadow-sm font-bold border-none`}>
                     {getRepairTypeLabel(selectedDevice.status)}
                   </Badge>
@@ -319,8 +319,8 @@ export function RepairScreen({ onBack }: { onBack: () => void }) {
                       <div className="flex items-center gap-4">
                         <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors" />
                         <div>
-                          <p className="text-sm font-black text-gray-900 dark:text-white uppercase">{device.barcode}</p>
-                          <p className="text-[10px] font-bold text-gray-400 mt-0.5">{device.brand} {device.model}</p>
+                          <p className="text-sm font-black text-gray-900 dark:text-white uppercase">{device.model}</p>
+                          <p className="text-[10px] font-bold text-gray-400 mt-0.5">{device.brand} • {device.barcode}</p>
                         </div>
                       </div>
                     </td>
@@ -389,8 +389,8 @@ export function RepairScreen({ onBack }: { onBack: () => void }) {
                       <Package className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <h4 className="text-base font-black text-gray-900 dark:text-white uppercase leading-none">{device.barcode}</h4>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{device.brand} {device.model}</p>
+                      <h4 className="text-base font-black text-gray-900 dark:text-white uppercase leading-none">{device.model}</h4>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{device.brand} • {device.barcode}</p>
                     </div>
                   </div>
                   <Badge className="bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border-none font-black text-[8px] px-2 rounded-lg uppercase">

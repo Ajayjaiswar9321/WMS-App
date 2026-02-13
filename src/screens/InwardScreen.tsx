@@ -16,7 +16,7 @@ import {
   MoreVertical,
   X,
   User,
-  Calendar
+  FileText
 } from 'lucide-react';
 import type { Batch } from '@/types';
 
@@ -34,6 +34,8 @@ export function InwardScreen() {
     vehicleNumber: '',
     driverName: '',
     courierPartner: '',
+    poNumber: '',
+    poAttachmentUrl: '',
     batchDate: new Date().toISOString().split('T')[0],
     notes: ''
   });
@@ -62,6 +64,8 @@ export function InwardScreen() {
       vehicleNumber: batchForm.vehicleNumber,
       driverName: batchForm.driverName,
       courierPartner: batchForm.courierPartner,
+      poNumber: batchForm.poNumber,
+      poAttachmentUrl: batchForm.poAttachmentUrl,
       batchDate: batchForm.batchDate,
       notes: batchForm.notes,
       deviceCount: 0,
@@ -77,6 +81,8 @@ export function InwardScreen() {
       vehicleNumber: '',
       driverName: '',
       courierPartner: '',
+      poNumber: '',
+      poAttachmentUrl: '',
       batchDate: new Date().toISOString().split('T')[0],
       notes: ''
     });
@@ -183,14 +189,14 @@ export function InwardScreen() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              {/* Courier Partner */}
+              {/* PO Number */}
               <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
-                <Label htmlFor="courier" className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">Courier Partner *</Label>
+                <Label htmlFor="poNumber" className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">PO Number (Optional if Uploaded)</Label>
                 <Input
-                  id="courier"
-                  placeholder="Enter courier partner"
-                  value={batchForm.courierPartner}
-                  onChange={(e) => setBatchForm({ ...batchForm, courierPartner: e.target.value })}
+                  id="poNumber"
+                  placeholder="Enter PO number"
+                  value={batchForm.poNumber}
+                  onChange={(e) => setBatchForm({ ...batchForm, poNumber: e.target.value })}
                   className="h-12 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all font-medium text-sm"
                 />
               </div>
@@ -205,6 +211,21 @@ export function InwardScreen() {
                   onChange={(e) => setBatchForm({ ...batchForm, batchDate: e.target.value })}
                   className="h-12 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all font-medium text-sm"
                 />
+              </div>
+            </div>
+
+            {/* PO Upload */}
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">Upload PO (Optional if number provided)</Label>
+              <div
+                onClick={() => setBatchForm({ ...batchForm, poAttachmentUrl: 'po-uploaded.pdf' })}
+                className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all hover:bg-gray-50 dark:hover:bg-gray-900 group cursor-pointer shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] ${batchForm.poAttachmentUrl ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800'}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-transform group-hover:scale-110 ${batchForm.poAttachmentUrl ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-50 dark:bg-gray-700 text-gray-400'}`}>
+                  <Upload className="w-4 h-4" />
+                </div>
+                <p className={`text-[10px] font-black uppercase tracking-widest ${batchForm.poAttachmentUrl ? 'text-emerald-700' : 'text-gray-400'}`}>
+                  {batchForm.poAttachmentUrl ? 'PO Uploaded' : 'Click to upload PO'}
+                </p>
               </div>
             </div>
 
@@ -244,12 +265,12 @@ export function InwardScreen() {
               Cancel
             </Button>
             <Button
-              className={`flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-95 ${!batchForm.customerName || !batchForm.vehicleNumber || !batchForm.driverName || !batchForm.courierPartner
+              className={`flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-95 ${!batchForm.customerName || !batchForm.vehicleNumber || !batchForm.driverName || (!batchForm.poNumber && !batchForm.poAttachmentUrl)
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : 'bg-black dark:bg-white dark:text-black text-white hover:opacity-90'
                 }`}
               onClick={handleCreateBatch}
-              disabled={!batchForm.customerName || !batchForm.vehicleNumber || !batchForm.driverName || !batchForm.courierPartner}
+              disabled={!batchForm.customerName || !batchForm.vehicleNumber || !batchForm.driverName || (!batchForm.poNumber && !batchForm.poAttachmentUrl)}
             >
               Create Batch
             </Button>
@@ -315,8 +336,14 @@ export function InwardScreen() {
                   <p className="text-sm font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.driverName || 'Sameer'}</p>
                 </div>
                 <div className="flex items-center justify-between sm:block space-y-1 border-t sm:border-none pt-2 sm:pt-0 border-gray-50">
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">Carrier</p>
-                  <p className="text-sm font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.courierPartner || 'DTDC'}</p>
+                  <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">PO Number</p>
+                  <p className="text-sm font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.poNumber || 'N/A'}</p>
+                </div>
+                <div className="flex items-center justify-between sm:block space-y-1 border-t sm:border-none pt-2 sm:pt-0 border-gray-50">
+                  <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">PO Attachment</p>
+                  <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tight truncate">
+                    {selectedBatch.poAttachmentUrl ? <span className="underline cursor-pointer">View Attachment</span> : 'No File'}
+                  </p>
                 </div>
                 <div className="flex items-center justify-between sm:block space-y-1 border-t sm:border-none pt-2 sm:pt-0 border-gray-50">
                   <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">Date</p>
@@ -380,24 +407,45 @@ export function InwardScreen() {
                   className="rounded-[1.5rem] border-none bg-white dark:bg-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] overflow-hidden animate-slide-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-[#EFF6FF] dark:bg-blue-900/20 rounded-full flex items-center justify-center shadow-inner">
-                        <Package className="w-6 h-6 text-[#2563EB]" />
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-[#EFF6FF] dark:bg-blue-900/20 rounded-full flex items-center justify-center shadow-inner">
+                          <Package className="w-6 h-6 text-[#2563EB]" />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-black text-[#111827] dark:text-white leading-none uppercase tracking-tight">
+                            {device.model}
+                          </h4>
+                          <p className="text-[10px] text-[#64748B] font-black mt-1.5 uppercase tracking-wide">
+                            {device.brand} • {device.barcode}
+                          </p>
+                          <p className="text-[10px] text-[#94A3B8] font-black uppercase tracking-widest mt-0.5">{device.serialNumber}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-base font-black text-[#111827] dark:text-white leading-none uppercase tracking-tight">
-                          {device.barcode}
-                        </h4>
-                        <p className="text-[10px] text-[#64748B] font-black mt-1.5 uppercase tracking-wide">
-                          {device.brand} {device.model}
-                        </p>
-                        <p className="text-[10px] text-[#94A3B8] font-black uppercase tracking-widest mt-0.5">{device.serialNumber}</p>
+                      <Badge variant="outline" className="border-[#DBEAFE] text-[#2563EB] bg-[#EFF6FF]/50 rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-tighter">
+                        {device.status.replace('_', ' ')}
+                      </Badge>
+                    </div>
+
+                    {/* Outward Dispatch History */}
+                    <div className="mt-4 pt-4 border-t border-gray-50 dark:border-gray-700/50">
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Outward Dispatch History</p>
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 flex items-center justify-center">
+                            <Truck className="w-4 h-4 text-emerald-600" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase leading-none">DISPATCHED TO RENTAL</p>
+                              <p className="text-[9px] font-bold text-gray-400">12 FEB 2026</p>
+                            </div>
+                            <p className="text-[10px] text-gray-500 font-medium mt-1">Ref: DIS-2026-0045 • HP EliteBook 840 G8</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <Badge variant="outline" className="border-[#DBEAFE] text-[#2563EB] bg-[#EFF6FF]/50 rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-tighter">
-                      stock out
-                    </Badge>
                   </CardContent>
                 </Card>
               ))}
@@ -521,7 +569,7 @@ export function InwardScreen() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-xl font-black tracking-tighter text-gray-900 dark:text-white uppercase leading-none" style={{ fontFamily: "'Inter', sans-serif" }}>Inward</h1>
-              <p className="text-[10px] font-bold text-[#94A3B8] mt-1 uppercase tracking-widest">BATCH MANAGEMENT</p>
+              {/* OPERATION text removed as requested */}
             </div>
             <Button
               onClick={() => setView('create')}
@@ -611,10 +659,8 @@ export function InwardScreen() {
                           <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{batch.deviceCount} Items</span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                          <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                            {new Date(batch.batchDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                          </span>
+                          <FileText className="w-3.5 h-3.5 text-gray-400" />
+                          <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">PO: {batch.poNumber || 'Uploaded'}</span>
                         </div>
                       </div>
                       <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-700/50 flex items-center justify-center group-hover:bg-blue-500 transition-colors">

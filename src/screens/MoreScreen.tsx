@@ -13,8 +13,6 @@ import {
   LogOut,
   ChevronRight,
   User as UserIcon,
-  Moon,
-  Sun,
   ArrowLeft,
   Plus,
   Edit2,
@@ -25,7 +23,8 @@ import {
   HelpCircle,
   Boxes,
   Wrench,
-  Package
+  Package,
+  Upload
 } from 'lucide-react';
 import type { User, Role } from '@/types';
 
@@ -115,8 +114,8 @@ export function PaintShopScreen({ onBack }: { onBack: () => void }) {
                         <Paintbrush className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                       </div>
                       <div>
-                        <h4 className="font-black text-base uppercase tracking-tight text-[#111827] dark:text-white leading-none mb-1.5">{device.barcode}</h4>
-                        <p className="text-[9px] text-[#64748B] font-black uppercase tracking-[0.15em]">{device.brand} {device.model}</p>
+                        <h4 className="font-black text-base uppercase tracking-tight text-[#111827] dark:text-white leading-none mb-1.5">{device.model}</h4>
+                        <p className="text-[9px] text-[#64748B] font-black uppercase tracking-[0.15em]">{device.brand} • {device.barcode}</p>
                       </div>
                     </div>
                     <Badge className="bg-[#EFF6FF] text-[#1D4ED8] dark:bg-blue-900/40 dark:text-blue-400 border-none rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-widest">
@@ -193,8 +192,8 @@ export function QCScreen({ onBack }: { onBack: () => void }) {
                         <CheckSquare className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
-                        <h4 className="font-black text-base uppercase tracking-tight text-[#111827] dark:text-white leading-none mb-1.5">{device.barcode}</h4>
-                        <p className="text-[9px] text-[#64748B] font-black uppercase tracking-[0.15em]">{device.brand} {device.model}</p>
+                        <h4 className="font-black text-base uppercase tracking-tight text-[#111827] dark:text-white leading-none mb-1.5">{device.model}</h4>
+                        <p className="text-[9px] text-[#64748B] font-black uppercase tracking-[0.15em]">{device.brand} • {device.barcode}</p>
                       </div>
                     </div>
                     <Badge className={`border-none rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-widest ${device.status === 'under_qc' ? 'bg-[#DBEAFE] text-[#1D4ED8]' : 'bg-[#FEF3C7] text-[#92400E]'
@@ -213,7 +212,53 @@ export function QCScreen({ onBack }: { onBack: () => void }) {
 }
 
 export function OutwardScreen({ onBack }: { onBack: () => void }) {
-  const { dispatches } = useDataStore();
+  const { dispatches, addDispatch } = useDataStore();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    type: 'sales' as 'sales' | 'rental',
+    customerName: '',
+    invoiceNumber: '',
+    invoiceAttachmentUrl: '',
+    poNumber: '',
+    poAttachmentUrl: '',
+    notes: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.customerName) return;
+    if (!formData.invoiceNumber && !formData.invoiceAttachmentUrl && !formData.poNumber && !formData.poAttachmentUrl) {
+      alert('Either Invoice Number/Upload or PO Number/Upload is required');
+      return;
+    }
+
+    const newDispatch = {
+      id: `DIS-${Date.now().toString().slice(-4)}`,
+      type: formData.type,
+      status: 'pending' as const,
+      customerName: formData.customerName,
+      invoiceNumber: formData.invoiceNumber,
+      invoiceAttachmentUrl: formData.invoiceAttachmentUrl,
+      poNumber: formData.poNumber,
+      poAttachmentUrl: formData.poAttachmentUrl,
+      notes: formData.notes,
+      dispatchDate: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      devices: []
+    };
+
+    addDispatch(newDispatch);
+    setIsDialogOpen(false);
+    setFormData({
+      type: 'sales',
+      customerName: '',
+      invoiceNumber: '',
+      invoiceAttachmentUrl: '',
+      poNumber: '',
+      poAttachmentUrl: '',
+      notes: ''
+    });
+  };
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
@@ -229,6 +274,7 @@ export function OutwardScreen({ onBack }: { onBack: () => void }) {
         </div>
       </header>
       <div className="flex-1 overflow-y-auto scrollable-content p-4 pb-24 space-y-4">
+        {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-3">
           <Card className="rounded-2xl border-none bg-white dark:bg-gray-800 shadow-sm">
             <CardContent className="p-4">
@@ -270,39 +316,57 @@ export function OutwardScreen({ onBack }: { onBack: () => void }) {
             </CardContent>
           </Card>
         </div>
+
         <Button
-          className="w-full h-12 rounded-2xl shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest text-xs"
-          onClick={() => alert('New Dispatch feature coming soon!')}
+          className="w-full h-12 rounded-2xl shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest text-xs bg-blue-600"
+          onClick={() => setIsDialogOpen(true)}
         >
           <Truck className="w-4 h-4 mr-2" />
           New Dispatch
         </Button>
+
         {dispatches.length === 0 ? (
-          <Card className="rounded-2xl border-none bg-white dark:bg-gray-800 shadow-sm">
-            <CardContent className="p-10 text-center">
-              <div className="w-12 h-12 bg-gray-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Truck className="w-6 h-6 text-gray-300" />
+          <Card className="rounded-[2.5rem] border-none bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+            <CardContent className="p-12 text-center">
+              <div className="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-gray-800 font-black">
+                <Truck className="w-8 h-8 text-gray-300" />
               </div>
-              <p className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">No dispatches yet</p>
-              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Create your first dispatch</p>
+              <p className="text-[#111827] dark:text-white font-black uppercase tracking-tight leading-none mb-1.5">No dispatches yet</p>
+              <p className="text-[10px] text-[#64748B] font-black uppercase tracking-widest">Start by creating a new dispatch</p>
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-4">
             {dispatches.map((dispatch, index) => (
-              <Card key={dispatch.id} className="rounded-2xl border-none bg-white dark:bg-gray-800 shadow-sm animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center">
-                        <Truck className="w-5 h-5 text-blue-600" />
+              <Card
+                key={dispatch.id}
+                className="rounded-[1.5rem] border-none bg-white dark:bg-gray-800 shadow-sm animate-slide-up group overflow-hidden"
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/40 rounded-2xl flex items-center justify-center shadow-inner">
+                        <Truck className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-black text-gray-900 dark:text-white">{dispatch.id}</p>
-                        <p className="text-[10px] font-bold text-gray-400">{dispatch.customerName}</p>
+                        <h4 className="font-black text-sm uppercase tracking-tight text-[#111827] dark:text-white leading-none mb-1.5">{dispatch.customerName}</h4>
+                        <p className="text-[9px] text-[#64748B] font-black uppercase tracking-[0.15em]">{dispatch.id} • {new Date(dispatch.dispatchDate || '').toLocaleDateString('en-GB')}</p>
                       </div>
                     </div>
-                    <Badge className="bg-blue-50 text-blue-600 border-none text-[9px] font-black uppercase">{dispatch.type}</Badge>
+                    <Badge className={`border-none rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-widest ${dispatch.type === 'sales' ? 'bg-[#DBEAFE] text-[#1D4ED8]' : 'bg-[#F3E8FF] text-[#7E22CE]'}`}>
+                      {dispatch.type}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-4 pt-4 border-t border-gray-50 dark:border-gray-800">
+                    <div className="flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-gray-400" />
+                      <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">INV: {dispatch.invoiceNumber || 'DOC'}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5 text-gray-400" />
+                      <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">PO: {dispatch.poNumber || 'DOC'}</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -310,6 +374,96 @@ export function OutwardScreen({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black tracking-tight">Create Dispatch</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-6 pt-4 pb-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Dispatch Type</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value: 'sales' | 'rental') => setFormData({ ...formData, type: value })}
+              >
+                <SelectTrigger className="h-12 rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sales">Sales</SelectItem>
+                  <SelectItem value="rental">Rental</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Customer Name *</Label>
+              <Input
+                value={formData.customerName}
+                onChange={e => setFormData({ ...formData, customerName: e.target.value })}
+                placeholder="Enter customer name"
+                className="h-12 rounded-xl"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Invoice Number</Label>
+                <Input
+                  value={formData.invoiceNumber}
+                  onChange={e => setFormData({ ...formData, invoiceNumber: e.target.value })}
+                  placeholder="INV-..."
+                  className="h-12 rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Upload Invoice</Label>
+                <div
+                  onClick={() => setFormData({ ...formData, invoiceAttachmentUrl: 'inv.pdf' })}
+                  className={`h-12 rounded-xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all ${formData.invoiceAttachmentUrl ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+                  <Upload className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">PO Number</Label>
+                <Input
+                  value={formData.poNumber}
+                  onChange={e => setFormData({ ...formData, poNumber: e.target.value })}
+                  placeholder="PO-..."
+                  className="h-12 rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Upload PO</Label>
+                <div
+                  onClick={() => setFormData({ ...formData, poAttachmentUrl: 'po.pdf' })}
+                  className={`h-12 rounded-xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all ${formData.poAttachmentUrl ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+                  <Upload className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Notes</Label>
+              <textarea
+                value={formData.notes}
+                onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                className="w-full min-h-[80px] p-3 rounded-xl border border-gray-100 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                placeholder="Optional notes..."
+              />
+            </div>
+
+            <Button type="submit" className="w-full h-14 rounded-2xl bg-blue-600 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
+              Complete Dispatch
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -773,11 +927,9 @@ export function RolesScreen({ onBack }: { onBack: () => void }) {
 }
 
 export function SettingsScreen({ onBack }: { onBack: () => void }) {
-  const { theme, toggleTheme } = useUIStore();
   const { logout } = useAuthStore();
 
   const settingsItems = [
-    { icon: Moon, label: 'Dark Mode', value: theme === 'dark', toggle: toggleTheme },
     { icon: Bell, label: 'Notifications', value: true },
     { icon: Database, label: 'Database', value: 'Connected' },
     { icon: FileText, label: 'Reports', value: null },
@@ -829,16 +981,7 @@ export function SettingsScreen({ onBack }: { onBack: () => void }) {
                     <Icon className="w-5 h-5 text-gray-500" />
                     <span className="font-medium">{item.label}</span>
                   </div>
-                  {item.toggle ? (
-                    <button
-                      onClick={item.toggle}
-                      className={`w-12 h-6 rounded-full transition-colors ${item.value ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                    >
-                      <div className={`w-5 h-5 bg-white rounded-full transition-transform ${item.value ? 'translate-x-6' : 'translate-x-0.5'
-                        }`} />
-                    </button>
-                  ) : item.value ? (
+                  {item.value ? (
                     <span className="text-sm text-gray-500">{item.value}</span>
                   ) : (
                     <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -868,7 +1011,7 @@ export function SettingsScreen({ onBack }: { onBack: () => void }) {
 
 export function MoreScreen() {
   const { user, logout } = useAuthStore();
-  const { theme, toggleTheme, setCurrentRoute } = useUIStore();
+  const { setCurrentRoute } = useUIStore();
 
   const menuItems = [
     { id: 'spares', label: 'Spares', icon: Boxes, color: 'bg-indigo-500', count: 0 },
@@ -958,31 +1101,6 @@ export function MoreScreen() {
           </div>
         </div>
 
-        {/* Preferences */}
-        <div className="space-y-4 pt-2">
-          <h3 className="font-black text-xs uppercase tracking-[0.15em] text-[#6B7280] px-1">Quick Preferences</h3>
-          <Card className="mobile-card border-none bg-white dark:bg-gray-900 shadow-sm rounded-2xl overflow-hidden">
-            <CardContent className="p-0">
-              <div
-                className="flex items-center justify-between p-4 cursor-pointer"
-                onClick={toggleTheme}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-xl flex items-center justify-center">
-                    {theme === 'dark' ? <Moon className="w-5 h-5 text-[#3B82F6]" /> : <Sun className="w-5 h-5 text-[#F59E0B]" />}
-                  </div>
-                  <div>
-                    <p className="text-sm font-black text-[#111827] uppercase tracking-tight">Appearance</p>
-                    <p className="text-[10px] text-[#6B7280] font-bold uppercase">{theme} mode active</p>
-                  </div>
-                </div>
-                <div className={`w-12 h-6 rounded-full transition-colors relative ${theme === 'dark' ? 'bg-[#3B82F6]' : 'bg-gray-200'}`}>
-                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${theme === 'dark' ? 'left-7' : 'left-1'}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Version */}
         <div className="pt-4 pb-2">

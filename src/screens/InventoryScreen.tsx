@@ -84,11 +84,9 @@ export function InventoryScreen() {
 
   // Inventory stats
   const stats = {
-    total: devices.length,
-    inStock: devices.filter(d => ['received', 'pending_inspection', 'under_inspection', 'ready_stock', 'qc_passed'].includes(d.status)).length,
-    ready: devices.filter(d => d.status === 'ready_stock' || d.status === 'qc_passed').length,
-    inRepair: devices.filter(d => ['under_repair', 'in_l3_repair', 'in_display_repair', 'in_battery_repair', 'waiting_spares'].includes(d.status)).length,
-    dispatched: devices.filter(d => d.status === 'stock_out' || d.status === 'dispatched').length,
+    totalReady: devices.filter(d => d.status === 'ready_stock' || d.status === 'qc_passed').length,
+    inStock: devices.filter(d => d.status === 'in_stock').length,
+    readyForStock: devices.filter(d => d.status === 'ready_stock' || d.status === 'qc_passed' || d.status === 'inspected').length,
   };
 
   if (view === 'detail' && selectedDevice) {
@@ -256,29 +254,23 @@ export function InventoryScreen() {
       </header>
 
       <div className="flex-1 overflow-y-auto scrollable-content p-4 space-y-4">
-        <div className="grid grid-cols-2 gap-3 animate-slide-up">
+        <div className="grid grid-cols-3 gap-2 animate-slide-up">
+          <Card className="mobile-card shadow-sm border-none bg-emerald-50/50 dark:bg-emerald-900/10">
+            <CardContent className="p-3">
+              <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">{stats.totalReady}</p>
+              <p className="text-[9px] font-black uppercase tracking-tight text-[#6B7280]">Total Ready for Stock</p>
+            </CardContent>
+          </Card>
           <Card className="mobile-card shadow-sm border-none bg-blue-50/50 dark:bg-blue-900/10">
             <CardContent className="p-3">
-              <p className="text-2xl font-black text-blue-600 dark:text-blue-400">{stats.total}</p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Total Stock</p>
+              <p className="text-xl font-black text-blue-600 dark:text-blue-400">{stats.inStock}</p>
+              <p className="text-[9px] font-black uppercase tracking-tight text-[#6B7280]">In Stock</p>
             </CardContent>
           </Card>
-          <Card className="mobile-card shadow-sm border-none bg-green-50/50 dark:bg-green-900/10">
+          <Card className="mobile-card shadow-sm border-none bg-indigo-50/50 dark:bg-indigo-900/10">
             <CardContent className="p-3">
-              <p className="text-2xl font-black text-green-600 dark:text-green-400">{stats.ready}</p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Ready Goods</p>
-            </CardContent>
-          </Card>
-          <Card className="mobile-card shadow-sm border-none bg-orange-50/50 dark:bg-orange-900/10">
-            <CardContent className="p-3">
-              <p className="text-2xl font-black text-orange-600 dark:text-orange-400">{stats.inRepair}</p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Under Repair</p>
-            </CardContent>
-          </Card>
-          <Card className="mobile-card shadow-sm border-none bg-gray-50/50 dark:bg-gray-800/10">
-            <CardContent className="p-3">
-              <p className="text-2xl font-black text-gray-600 dark:text-gray-400">{stats.dispatched}</p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Dispatched</p>
+              <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">{stats.readyForStock}</p>
+              <p className="text-[9px] font-black uppercase tracking-tight text-[#6B7280]">Ready For Stock</p>
             </CardContent>
           </Card>
         </div>
@@ -286,11 +278,9 @@ export function InventoryScreen() {
         {/* Filter Tabs */}
         <div className="flex gap-2 overflow-x-auto hide-scrollbar py-2">
           {[
-            { id: 'all', label: 'All', count: stats.total },
+            { id: 'all', label: 'All', count: devices.length },
             { id: 'in_stock', label: 'In Stock', count: stats.inStock },
-            { id: 'ready', label: 'Ready', count: stats.ready },
-            { id: 'repair', label: 'Repair', count: stats.inRepair },
-            { id: 'out', label: 'Sent', count: stats.dispatched },
+            { id: 'ready', label: 'Ready', count: stats.totalReady },
           ].map((filter) => (
             <button
               key={filter.id}
@@ -347,7 +337,7 @@ export function InventoryScreen() {
                         <div>
                           <div className="flex items-center gap-2">
                             <h3 className="text-base font-black text-[#111827] dark:text-white leading-none uppercase tracking-tight">
-                              {device.barcode}
+                              {device.model}
                             </h3>
                             {device.grade && (
                               <span className={`w-5 h-5 ${getGradeColor(device.grade)} rounded-lg flex items-center justify-center text-white text-[10px] font-black`}>
@@ -356,7 +346,7 @@ export function InventoryScreen() {
                             )}
                           </div>
                           <p className="text-[10px] text-[#6B7280] font-bold mt-1 uppercase tracking-wider">
-                            {device.brand} {device.model}
+                            {device.brand} • {device.barcode}
                           </p>
                         </div>
                       </div>

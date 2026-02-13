@@ -101,8 +101,8 @@ export function InspectionScreen() {
                   <ClipboardCheck className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-black text-gray-900 dark:text-white leading-none">{scannedDevice.barcode}</h2>
-                  <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase truncate max-w-[150px]">{scannedDevice.brand} {scannedDevice.model}</p>
+                  <h2 className="text-sm font-black text-gray-900 dark:text-white leading-none">{scannedDevice.model}</h2>
+                  <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase truncate max-w-[150px]">{scannedDevice.brand} • {scannedDevice.barcode}</p>
                 </div>
               </div>
               <div className="text-right">
@@ -269,10 +269,10 @@ export function InspectionScreen() {
                       </div>
                       <div>
                         <h3 className="text-lg font-black text-gray-900 dark:text-white leading-none tracking-tight">
-                          {device.barcode}
+                          {device.model}
                         </h3>
                         <p className="text-[10px] text-[#94A3B8] font-black uppercase tracking-widest mt-1.5">
-                          {device.brand} {device.model}
+                          {device.brand} • {device.barcode}
                         </p>
                       </div>
                     </div>

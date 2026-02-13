@@ -380,20 +380,14 @@ export const useDashboardStats = () => {
   return {
     totalDevices: devices.length,
     pendingInspection: devices.filter(d => d.status === 'pending_inspection').length,
-    underInspection: devices.filter(d => d.status === 'under_inspection').length,
+    inspected: devices.filter(d => d.status === 'inspected').length,
     waitingSpares: devices.filter(d => d.status === 'waiting_spares').length,
-    readyForRepair: devices.filter(d => d.status === 'ready_repair').length,
-    underRepair: devices.filter(d => d.status === 'under_repair').length,
-    inL3Repair: devices.filter(d => d.status === 'in_l3_repair').length,
-    inDisplayRepair: devices.filter(d => d.status === 'in_display_repair').length,
-    inBatteryRepair: devices.filter(d => d.status === 'in_battery_repair').length,
-    inPaintShop: devices.filter(d => d.status === 'in_paint_shop').length,
-    awaitingQC: devices.filter(d => d.status === 'awaiting_qc').length,
-    underQC: devices.filter(d => d.status === 'under_qc').length,
-    qcPassed: devices.filter(d => d.status === 'qc_passed').length,
-    readyStock: devices.filter(d => d.status === 'ready_stock').length,
-    inRepairWorkflow: devices.filter(d =>
+    inPaint: devices.filter(d => d.status === 'in_paint_shop').length,
+    inRepair: devices.filter(d =>
       ['under_repair', 'in_l3_repair', 'in_display_repair', 'in_battery_repair'].includes(d.status)
-    ).length
+    ).length,
+    inQC: devices.filter(d => d.status === 'under_qc' || d.status === 'awaiting_qc').length,
+    readyForStock: devices.filter(d => d.status === 'ready_stock').length,
+    inStock: devices.filter(d => d.status === 'in_stock').length,
   };
 };
