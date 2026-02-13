@@ -167,6 +167,7 @@ const mockBatches: Batch[] = [
   {
     id: '1',
     batchNumber: 'BATCH-2026-0001',
+    customerName: 'Standard Customer',
     type: 'refurb',
     status: 'completed',
     vehicleNumber: 'MH03CL 8085',
