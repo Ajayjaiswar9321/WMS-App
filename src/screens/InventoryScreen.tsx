@@ -28,20 +28,20 @@ export function InventoryScreen() {
     switch (status) {
       case 'ready_stock':
       case 'qc_passed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+        return 'bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]';
       case 'stock_out':
       case 'dispatched':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';
+        return 'bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB]';
       case 'under_repair':
       case 'in_l3_repair':
       case 'in_display_repair':
       case 'in_battery_repair':
       case 'waiting_spares':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400';
+        return 'bg-[#FEFCE8] text-[#854D0E] border border-[#FEF08A]';
       case 'qc_failed':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
+        return 'bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA]';
       default:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400';
+        return 'bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]';
     }
   };
 
@@ -257,51 +257,51 @@ export function InventoryScreen() {
 
       <div className="flex-1 overflow-y-auto scrollable-content p-4 space-y-4">
         <div className="grid grid-cols-2 gap-3 animate-slide-up">
-          <Card className="mobile-card shadow-3d border-none bg-blue-50/50 dark:bg-blue-900/10">
+          <Card className="mobile-card shadow-sm border-none bg-blue-50/50 dark:bg-blue-900/10">
             <CardContent className="p-3">
               <p className="text-2xl font-black text-blue-600 dark:text-blue-400">{stats.total}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Total</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Total Stock</p>
             </CardContent>
           </Card>
-          <Card className="mobile-card shadow-3d border-none bg-green-50/50 dark:bg-green-900/10">
+          <Card className="mobile-card shadow-sm border-none bg-green-50/50 dark:bg-green-900/10">
             <CardContent className="p-3">
               <p className="text-2xl font-black text-green-600 dark:text-green-400">{stats.ready}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Ready</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Ready Goods</p>
             </CardContent>
           </Card>
-          <Card className="mobile-card shadow-3d border-none bg-orange-50/50 dark:bg-orange-900/10">
+          <Card className="mobile-card shadow-sm border-none bg-orange-50/50 dark:bg-orange-900/10">
             <CardContent className="p-3">
               <p className="text-2xl font-black text-orange-600 dark:text-orange-400">{stats.inRepair}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Repair</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Under Repair</p>
             </CardContent>
           </Card>
-          <Card className="mobile-card shadow-3d border-none bg-gray-50/50 dark:bg-gray-800/10">
+          <Card className="mobile-card shadow-sm border-none bg-gray-50/50 dark:bg-gray-800/10">
             <CardContent className="p-3">
               <p className="text-2xl font-black text-gray-600 dark:text-gray-400">{stats.dispatched}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Sent</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Dispatched</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar">
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar py-2">
           {[
             { id: 'all', label: 'All', count: stats.total },
             { id: 'in_stock', label: 'In Stock', count: stats.inStock },
             { id: 'ready', label: 'Ready', count: stats.ready },
             { id: 'repair', label: 'Repair', count: stats.inRepair },
-            { id: 'out', label: 'Out', count: stats.dispatched },
+            { id: 'out', label: 'Sent', count: stats.dispatched },
           ].map((filter) => (
             <button
               key={filter.id}
               onClick={() => setActiveFilter(filter.id as FilterStatus)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${activeFilter === filter.id
-                ? 'bg-blue-500 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeFilter === filter.id
+                ? 'bg-[#3B82F6] text-white shadow-lg shadow-blue-500/20'
+                : 'bg-white dark:bg-gray-800 text-[#6B7280] border border-gray-100 dark:border-gray-700'
                 }`}
             >
               {filter.label}
-              <span className={`px-2 py-0.5 rounded-full text-xs ${activeFilter === filter.id ? 'bg-blue-400 text-white' : 'bg-gray-100 dark:bg-gray-700'
+              <span className={`px-2 py-0.5 rounded-lg text-[10px] ${activeFilter === filter.id ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-gray-700'
                 }`}>
                 {filter.count}
               </span>
@@ -311,27 +311,27 @@ export function InventoryScreen() {
 
         {/* Devices List */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold">Devices</h3>
-            <span className="text-sm text-gray-500">
-              Showing {filteredDevices.length} of {devices.length}
+          <div className="flex items-center justify-between mb-4 px-1">
+            <h3 className="font-black text-xs uppercase tracking-[0.15em] text-[#6B7280]">Device Assets</h3>
+            <span className="text-[10px] font-bold text-[#9CA3AF]">
+              {filteredDevices.length} ITEMS
             </span>
           </div>
 
           {filteredDevices.length === 0 ? (
-            <Card className="mobile-card">
-              <CardContent className="p-8 text-center">
-                <Boxes className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                <p className="text-gray-500">No devices found</p>
-                <p className="text-sm text-gray-400 mt-1">Try adjusting your search or filters</p>
+            <Card className="mobile-card border-none shadow-sm">
+              <CardContent className="p-10 text-center">
+                <Boxes className="w-12 h-12 mx-auto text-gray-300 mb-3 opacity-20" />
+                <p className="text-[#111827] font-black uppercase tracking-tight">No results</p>
+                <p className="text-xs text-[#6B7280] font-medium mt-1">Try adjusting your search or filters</p>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {filteredDevices.map((device, index) => (
                 <Card
                   key={device.id}
-                  className="mobile-card cursor-pointer shadow-3d animate-slide-up hover:scale-[1.01]"
+                  className="mobile-card cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-[0.98] border-none bg-white dark:bg-gray-900 rounded-[1.5rem] overflow-hidden animate-slide-up"
                   style={{ animationDelay: `${index * 0.05}s` }}
                   onClick={() => {
                     setSelectedDevice(device);
@@ -339,31 +339,41 @@ export function InventoryScreen() {
                   }}
                 >
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center shadow-inner">
-                          <Package className="w-6 h-6 text-blue-600" />
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center shadow-inner">
+                          <Package className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="font-bold text-gray-900 dark:text-gray-100 leading-tight">{device.barcode}</p>
+                            <h3 className="text-base font-black text-[#111827] dark:text-white leading-none uppercase tracking-tight">
+                              {device.barcode}
+                            </h3>
                             {device.grade && (
-                              <span className={`w-5 h-5 ${getGradeColor(device.grade)} rounded-full flex items-center justify-center text-white text-[10px] font-black`}>
+                              <span className={`w-5 h-5 ${getGradeColor(device.grade)} rounded-lg flex items-center justify-center text-white text-[10px] font-black`}>
                                 {device.grade}
                               </span>
                             )}
                           </div>
-                          <p className="text-xs font-medium text-gray-500">{device.brand} {device.model}</p>
-                          <p className="text-[10px] font-mono tracking-tighter text-gray-400">{device.category}</p>
+                          <p className="text-[10px] text-[#6B7280] font-bold mt-1 uppercase tracking-wider">
+                            {device.brand} {device.model}
+                          </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Badge className={`text-[10px] font-bold border-none shadow-sm ${getStatusColor(device.status)}`}>
-                          {getStatusLabel(device.status)}
+                      <Badge className={`${getStatusColor(device.status)} border-none rounded-lg px-2 py-0.5 text-[10px] font-black uppercase tracking-wider`}>
+                        {getStatusLabel(device.status)}
+                      </Badge>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-50 dark:border-gray-800">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[9px] font-bold border-gray-200 text-gray-500 uppercase tracking-widest px-2">
+                          {device.category}
                         </Badge>
-                        <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center shadow-sm">
-                          <ChevronRight className="w-5 h-5 text-gray-400" />
-                        </div>
+                        <p className="text-[9px] font-mono text-gray-400">SN: {device.serialNumber}</p>
+                      </div>
+                      <div className="flex items-center text-[#3B82F6] font-bold text-[10px] uppercase tracking-wider">
+                        DETAILS <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
                       </div>
                     </div>
                   </CardContent>

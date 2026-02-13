@@ -214,10 +214,30 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       login: async (email: string, password: string) => {
-        // Mock login - accept admin@comprint.in with password 1
-        if (email === 'admin@comprint.in' && password === '1') {
+        if (password !== '123456') return false;
+
+        const roleMap: Record<string, string> = {
+          'admin@user.com': 'ADMIN',
+          'storemanager@gmail.com': 'MIS_WAREHOUSE_EXECUTIVE',
+          'qcuser@gmail.com': 'QC_ENGINEER',
+          'l2engineer@gmail.com': 'L2_ENGINEER',
+          'inward@gmail.com': 'MIS_WAREHOUSE_EXECUTIVE',
+          'outward@gmail.com': 'MIS_WAREHOUSE_EXECUTIVE',
+          'superadmin@gmail.com': 'SUPERADMIN'
+        };
+
+        const roleCode = roleMap[email];
+        if (roleCode) {
+          const role = mockRoles.find(r => r.code === roleCode) || mockRoles[0];
           set({
-            user: mockUsers[0],
+            user: {
+              id: Math.random().toString(36).substr(2, 9),
+              email,
+              name: email.split('@')[0],
+              role,
+              status: 'active',
+              createdAt: new Date().toISOString()
+            },
             isAuthenticated: true
           });
           return true;
