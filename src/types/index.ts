@@ -39,17 +39,17 @@ export interface Device {
   updatedAt: string;
 }
 
-export type DeviceCategory = 
-  | 'Laptop' 
-  | 'Desktop' 
-  | 'Workstation' 
-  | 'Server' 
-  | 'Monitor' 
-  | 'Storage' 
-  | 'Networking' 
+export type DeviceCategory =
+  | 'Laptop'
+  | 'Desktop'
+  | 'Workstation'
+  | 'Server'
+  | 'Monitor'
+  | 'Storage'
+  | 'Networking'
   | 'Other';
 
-export type DeviceStatus = 
+export type DeviceStatus =
   | 'received'
   | 'pending_inspection'
   | 'under_inspection'
@@ -65,8 +65,10 @@ export type DeviceStatus =
   | 'qc_passed'
   | 'qc_failed'
   | 'ready_stock'
+  | 'in_stock'
   | 'stock_out'
-  | 'dispatched';
+  | 'dispatched'
+  | 'inspected';
 
 export type DeviceGrade = 'A' | 'B' | 'C' | 'D';
 
@@ -76,10 +78,14 @@ export interface Batch {
   batchNumber: string;
   type: 'refurb' | 'rental_return';
   status: 'pending' | 'in_progress' | 'completed';
+  customerName: string;
+  rentalInvoiceNumber?: string;
   vehicleNumber: string;
   driverName: string;
   courierPartner: string;
   challanUrl?: string;
+  poNumber?: string;
+  poAttachmentUrl?: string;
   batchDate: string;
   notes?: string;
   deviceCount: number;
@@ -183,6 +189,10 @@ export interface Dispatch {
   trackingNumber?: string;
   courierPartner?: string;
   dispatchDate?: string;
+  poNumber?: string;
+  poAttachmentUrl?: string;
+  invoiceNumber?: string;
+  invoiceAttachmentUrl?: string;
   notes?: string;
   createdAt: string;
 }

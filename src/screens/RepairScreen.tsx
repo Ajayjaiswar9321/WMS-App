@@ -9,10 +9,14 @@ import {
   Monitor,
   Battery,
   Cpu,
-  Play,
   Pause,
-  CheckCircle
+  CheckCircle,
+  AlertCircle,
+  Search,
+  ChevronRight,
+  Package
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import type { Device } from '@/types';
 
 type RepairTab = 'all' | 'in_progress' | 'almost_done' | 'needs_spares';
@@ -24,9 +28,9 @@ interface RepairForm {
   sparePartsUsed: string[];
 }
 
-export function RepairScreen() {
+export function RepairScreen({ onBack }: { onBack: () => void }) {
   const { devices, updateDevice } = useDataStore();
-  const [activeTab, setActiveTab] = useState<RepairTab>('all');
+  const [activeTab] = useState<RepairTab>('all');
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [view, setView] = useState<'list' | 'detail' | 'work'>('list');
   const [repairForm, setRepairForm] = useState<RepairForm>({
@@ -62,11 +66,11 @@ export function RepairScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'waiting_spares': return 'bg-orange-100 text-orange-800';
-      case 'in_l3_repair': return 'bg-red-100 text-red-800';
-      case 'in_display_repair': return 'bg-blue-100 text-blue-800';
-      case 'in_battery_repair': return 'bg-green-100 text-green-800';
-      default: return 'bg-purple-100 text-purple-800';
+      case 'waiting_spares': return 'bg-[#FEFCE8] text-[#854D0E]';
+      case 'in_l3_repair': return 'bg-[#FEF2F2] text-[#991B1B]';
+      case 'in_display_repair': return 'bg-[#EFF6FF] text-[#1E40AF]';
+      case 'in_battery_repair': return 'bg-[#F0FDF4] text-[#166534]';
+      default: return 'bg-[#F5F3FF] text-[#5B21B6]';
     }
   };
 
@@ -97,17 +101,21 @@ export function RepairScreen() {
     return (
       <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
         {/* Header */}
-        <header className="flex-shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top">
-          <div className="flex items-center gap-3 px-4 py-3">
+        <header className="flex-shrink-0 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 safe-area-top">
+          <div className="flex items-center gap-3 px-4 py-4">
             <button
-              onClick={() => setView('list')}
-              className="p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              onClick={() => (view === 'work' ? setView('list') : onBack())}
+              className="p-2 -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="flex-1">
-              <h1 className="text-lg font-semibold">Repair Work</h1>
-              <p className="text-xs text-gray-500">{selectedDevice.barcode}</p>
+            <div>
+              <h1 className="text-xl font-black tracking-tighter text-gray-900 dark:text-white leading-none">
+                {view === 'work' ? 'Repair Work' : 'Repair Station'}
+              </h1>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] mt-1">
+                {view === 'work' ? selectedDevice.barcode : 'Manage device repairs'}
+              </p>
             </div>
           </div>
         </header>
@@ -122,9 +130,9 @@ export function RepairScreen() {
                 </div>
                 <div>
                   <p className="font-black text-xl text-purple-900 dark:text-purple-100 leading-tight">
-                    {selectedDevice.brand} {selectedDevice.model}
+                    {selectedDevice.model}
                   </p>
-                  <p className="text-sm font-bold text-purple-700 dark:text-purple-400 mb-1">{selectedDevice.category}</p>
+                  <p className="text-sm font-bold text-purple-700 dark:text-purple-400 mb-1">{selectedDevice.brand} • {selectedDevice.barcode}</p>
                   <Badge className={`${getStatusColor(selectedDevice.status)} shadow-sm font-bold border-none`}>
                     {getRepairTypeLabel(selectedDevice.status)}
                   </Badge>
@@ -224,132 +232,201 @@ export function RepairScreen() {
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="flex-shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top">
-        <div className="px-4 py-3">
-          <h1 className="text-lg font-semibold">Repair Station</h1>
-          <p className="text-xs text-gray-500">Manage device repairs</p>
+      {/* Header - Mobile First */}
+      <header className="flex-shrink-0 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 safe-area-top">
+        <div className="px-4 py-4">
+          <h1 className="text-xl font-black tracking-tighter text-gray-900 dark:text-white leading-none">Repair Station</h1>
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] mt-1">Devices needing repair</p>
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto scrollable-content p-4 space-y-4">
-        {/* Stats */}
+      <div className="flex-1 overflow-y-auto scrollable-content p-4 space-y-6 pb-24">
+        {/* Stats Grid - Mobile First */}
         <div className="grid grid-cols-3 gap-3 animate-slide-up">
-          <Card className="mobile-card shadow-3d border-none bg-blue-50/50 dark:bg-blue-900/10">
-            <CardContent className="p-3 text-center">
-              <p className="text-2xl font-black text-blue-600 dark:text-blue-400">{repairDevices.length}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">In Prep</p>
-            </CardContent>
-          </Card>
-          <Card className="mobile-card shadow-3d border-none bg-orange-50/50 dark:bg-orange-900/10">
-            <CardContent className="p-3 text-center">
-              <p className="text-2xl font-black text-orange-600 dark:text-orange-400">
-                {devices.filter(d => d.status === 'waiting_spares').length}
-              </p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Spares</p>
-            </CardContent>
-          </Card>
-          <Card className="mobile-card shadow-3d border-none bg-green-50/50 dark:bg-green-900/10">
-            <CardContent className="p-3 text-center">
-              <p className="text-2xl font-black text-green-600 dark:text-green-400">0</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Fixed</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filter Tabs */}
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar">
-          {[
-            { id: 'all', label: 'All', count: repairDevices.length },
-            { id: 'in_progress', label: 'In Progress', count: repairDevices.filter(d => ['under_repair', 'in_l3_repair', 'in_display_repair', 'in_battery_repair'].includes(d.status)).length },
-            { id: 'almost_done', label: 'Almost Done', count: 0 },
-            { id: 'needs_spares', label: 'Needs Spares', count: devices.filter(d => d.status === 'waiting_spares').length },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as RepairTab)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab.id
-                ? 'bg-blue-500 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
-                }`}
-            >
-              {tab.label}
-              <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === tab.id ? 'bg-blue-400 text-white' : 'bg-gray-100 dark:bg-gray-700'
-                }`}>
-                {tab.count}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-4 gap-3 animate-scale-in" style={{ animationDelay: '0.1s' }}>
-          {[
-            { type: 'under_repair', label: 'L2', icon: Wrench, color: 'bg-purple-600 shadow-purple-500/20' },
-            { type: 'in_l3_repair', label: 'L3', icon: Cpu, color: 'bg-red-600 shadow-red-500/20' },
-            { type: 'in_display_repair', label: 'Display', icon: Monitor, color: 'bg-blue-600 shadow-blue-500/20' },
-            { type: 'in_battery_repair', label: 'Battery', icon: Battery, color: 'bg-green-600 shadow-green-500/20' },
-          ].map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.type}
-                onClick={() => setActiveTab('in_progress')}
-                className="flex flex-col items-center gap-2 p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-3d btn-3d"
-              >
-                <div className={`w-12 h-12 ${item.color} rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/10`}>
-                  <Icon className="w-6 h-6 text-white" />
+          <Card className="rounded-2xl border-none bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+            <CardContent className="p-4">
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center">
+                  <Wrench className="w-5 h-5 text-blue-500" />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-tighter">{item.label}</span>
-              </button>
-            );
-          })}
+                <div>
+                  <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">{repairDevices.length}</p>
+                  <p className="text-[8px] font-black uppercase tracking-widest text-gray-400 mt-1">NEEDING</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-none bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+            <CardContent className="p-4">
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-emerald-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">
+                    {repairDevices.filter(d => d.status === 'ready_repair').length}
+                  </p>
+                  <p className="text-[8px] font-black uppercase tracking-widest text-gray-400 mt-1">NEW</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-none bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+            <CardContent className="p-4">
+              <div className="flex flex-col items-center text-center gap-2">
+                <div className="w-10 h-10 bg-orange-50 dark:bg-orange-900/20 rounded-xl flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-orange-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">0</p>
+                  <p className="text-[8px] font-black uppercase tracking-widest text-gray-400 mt-1">REWORK</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Devices List */}
-        <div>
-          <h3 className="font-semibold mb-3">Devices in Repair</h3>
+        {/* Global Search - Mobile Optimized */}
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-colors group-focus-within:text-blue-500" />
+          <Input
+            placeholder="Search devices..."
+            className="pl-11 h-12 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 text-sm font-medium placeholder:font-bold placeholder:text-gray-300 transition-all focus:ring-2 focus:ring-blue-500/20 shadow-sm"
+          />
+        </div>
 
-          {filteredDevices.length === 0 ? (
-            <Card className="mobile-card">
-              <CardContent className="p-8 text-center">
-                <Wrench className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                <p className="text-gray-500">No devices in repair workflow</p>
-                <p className="text-sm text-gray-400 mt-1">Devices will appear here after inspection</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {filteredDevices.map((device, index) => (
-                <Card
-                  key={device.id}
-                  className="mobile-card shadow-3d animate-slide-up hover:scale-[1.01]"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
+        {/* Device Table - Desktop Only */}
+        <Card className="rounded-2xl border-none bg-white dark:bg-gray-900 shadow-sm overflow-hidden hidden lg:block">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#F8FAFC] dark:bg-gray-800/50">
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Device</th>
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Category</th>
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Rework</th>
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Status</th>
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Spares</th>
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Paint</th>
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+                {filteredDevices.map((device) => (
+                  <tr key={device.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors group">
+                    <td className="px-6 py-6">
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${getStatusColor(device.status)}`}>
-                          {getRepairTypeIcon(device.status)}
-                        </div>
+                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors" />
                         <div>
-                          <p className="font-bold text-gray-900 dark:text-gray-100 leading-tight">{device.barcode}</p>
-                          <p className="text-xs font-medium text-gray-500 mb-1">{device.brand} {device.model}</p>
-                          <Badge className={`text-[10px] font-bold border-none shadow-sm ${getStatusColor(device.status)}`}>
-                            {getRepairTypeLabel(device.status)}
-                          </Badge>
+                          <p className="text-sm font-black text-gray-900 dark:text-white uppercase">{device.model}</p>
+                          <p className="text-[10px] font-bold text-gray-400 mt-0.5">{device.brand} • {device.barcode}</p>
                         </div>
                       </div>
-                      <Button
-                        size="icon"
-                        className="w-10 h-10 rounded-xl bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 btn-3d"
-                        onClick={() => handleStartRepair(device)}
-                      >
-                        <Play className="w-4 h-4 fill-current" />
-                      </Button>
+                    </td>
+                    <td className="px-6 py-6 font-bold text-[10px] uppercase text-gray-400">
+                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md">{device.category}</span>
+                    </td>
+                    <td className="px-6 py-6">
+                      <Badge className="bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 border-none font-black text-[9px] px-2.5 rounded-lg">NEW</Badge>
+                    </td>
+                    <td className="px-6 py-6">
+                      <Badge className="bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border-none font-black text-[9px] px-2.5 rounded-lg uppercase tracking-tight">
+                        {device.status.replace(/_/g, ' ')}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-6">
+                      <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-500 uppercase">
+                        <CheckCircle className="w-3.5 h-3.5" /> Issued
+                      </div>
+                    </td>
+                    <td className="px-6 py-6">
+                      <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-500 uppercase">
+                        <CheckCircle className="w-3.5 h-3.5" /> Done
+                      </div>
+                    </td>
+                    <td className="px-6 py-6 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        {device.status === 'ready_repair' ? (
+                          <Button
+                            className="bg-blue-600 hover:bg-blue-700 h-9 rounded-xl px-4 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-500/20"
+                            onClick={() => handleStartRepair(device)}
+                          >
+                            <Wrench className="w-3.5 h-3.5 mr-2" /> Start
+                          </Button>
+                        ) : (
+                          <Button
+                            className="bg-emerald-600 hover:bg-emerald-700 h-9 rounded-xl px-4 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20"
+                            onClick={() => handleStartRepair(device)} // Re-using handleStart for now to show WORK view
+                          >
+                            <CheckCircle className="w-3.5 h-3.5 mr-2" /> Complete
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="p-6 border-t border-gray-50 dark:border-gray-800 flex justify-center bg-[#F8FAFC] dark:bg-gray-800/30">
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{filteredDevices.length} RESULTS</p>
+          </div>
+        </Card>
+
+        {/* Device List - Mobile */}
+        <div className="lg:hidden space-y-4">
+          {filteredDevices.map((device, index) => (
+            <Card
+              key={device.id}
+              className="rounded-[1.5rem] border-none bg-white dark:bg-gray-900 shadow-[0_4px_20px_rgba(0,0,0,0.03)] overflow-hidden animate-slide-up"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center shadow-inner">
+                      <Package className="w-5 h-5 text-blue-600" />
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <div>
+                      <h4 className="text-base font-black text-gray-900 dark:text-white uppercase leading-none">{device.model}</h4>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{device.brand} • {device.barcode}</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border-none font-black text-[8px] px-2 rounded-lg uppercase">
+                    {device.status.replace(/_/g, ' ')}
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800">
+                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Category</p>
+                    <p className="text-xs font-black text-gray-700 dark:text-gray-300 uppercase">{device.category}</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800">
+                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Status</p>
+                    <Badge className="bg-emerald-50 text-emerald-600 border-none font-black text-[8px] px-1.5 h-4 uppercase">NEW</Badge>
+                  </div>
+                </div>
+
+                <Button
+                  className={`w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg ${device.status === 'ready_repair' ? 'bg-blue-600 shadow-blue-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}
+                  onClick={() => handleStartRepair(device)}
+                >
+                  {device.status === 'ready_repair' ? (
+                    <><Wrench className="w-3.5 h-3.5 mr-2" /> Start Repair</>
+                  ) : (
+                    <><CheckCircle className="w-3.5 h-3.5 mr-2" /> Complete Repair</>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+
+          {filteredDevices.length === 0 && (
+            <div className="py-20 text-center">
+              <Package className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+              <p className="text-sm font-black text-gray-400 uppercase tracking-widest">No devices found</p>
             </div>
           )}
         </div>

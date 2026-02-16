@@ -54,13 +54,13 @@ export function LoginScreen() {
 
 
   return (
-    <div className={`h-full w-full bg-[#ebf0ff] dark:bg-gray-950 flex flex-col overflow-hidden relative transition-all duration-700 ${isSuccess ? 'scale-110 opacity-0 blur-xl' : 'scale-100 opacity-100 blur-0'}`}>
+    <div className={`h-full w-full bg-[#F5F5F7] dark:bg-gray-950 flex flex-col overflow-hidden relative transition-all duration-700 ${isSuccess ? 'scale-110 opacity-0 blur-xl' : 'scale-100 opacity-100 blur-0'}`}>
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative">
         {/* Progress Bar (Visible when loading) */}
         {isLoading && (
           <div className="fixed top-0 left-0 w-full h-1 z-[100] bg-blue-100 dark:bg-gray-800 overflow-hidden">
             <div
-              className="h-full bg-blue-600 transition-all duration-300 ease-out shadow-[0_0_10px_rgba(37,99,235,0.5)]"
+              className="h-full bg-emerald-600 transition-all duration-300 ease-out shadow-[0_0_10px_rgba(16,185,129,0.5)]"
               style={{ width: `${loginProgress}%` }}
             />
           </div>
@@ -70,7 +70,7 @@ export function LoginScreen() {
         <div className={`animate-scale-in text-center mb-6 transition-all duration-500 ${isLoading ? 'opacity-50 blur-[1px]' : ''}`}>
           {/* Logo with 3D context */}
           <div className="relative group perspective-1000 mb-4">
-            <div className={`w-20 h-20 bg-blue-600 rounded-[1.5rem] flex items-center justify-center mx-auto shadow-3d animate-float transition-all duration-500 ${isLoading ? 'animate-pulse scale-110' : ''}`}>
+            <div className={`w-20 h-20 bg-emerald-600 rounded-[1.5rem] flex items-center justify-center mx-auto shadow-3d animate-float transition-all duration-500 ${isLoading ? 'animate-pulse scale-110' : ''}`}>
               <Package className="w-10 h-10 text-white" />
             </div>
           </div>
@@ -89,7 +89,7 @@ export function LoginScreen() {
           {/* Stats Row */}
           <div className="flex items-center justify-center gap-10 mb-2">
             <div className="text-center">
-              <p className="text-xl font-black text-blue-600">5K+</p>
+              <p className="text-xl font-black text-emerald-600">5K+</p>
               <p className="text-[9px] font-bold text-[#94a3b8] uppercase tracking-tighter text-center">Devices</p>
             </div>
             <div className="text-center">
@@ -114,8 +114,8 @@ export function LoginScreen() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-                  <Label htmlFor="email" className="text-base font-bold text-[#1e293b] dark:text-gray-200">
-                    Email
+                  <Label htmlFor="email" className="text-sm font-semibold text-[#374151] dark:text-gray-200 uppercase tracking-wider">
+                    Email Address
                   </Label>
                   <Input
                     id="email"
@@ -123,13 +123,13 @@ export function LoginScreen() {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="h-14 px-4 rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-600 transition-all font-medium text-lg shadow-sm"
+                    className="h-12 px-4 rounded-xl border-[#D1D5DB] dark:border-gray-800 bg-white dark:bg-gray-800/50 focus:ring-2 focus:ring-[#3B82F6] transition-all font-medium text-base shadow-sm"
                     required
                   />
                 </div>
 
                 <div className="space-y-2 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-                  <Label htmlFor="password" className="text-base font-bold text-[#1e293b] dark:text-gray-200">
+                  <Label htmlFor="password" className="text-sm font-semibold text-[#374151] dark:text-gray-200 uppercase tracking-wider">
                     Password
                   </Label>
                   <div className="relative">
@@ -139,13 +139,13 @@ export function LoginScreen() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="h-14 px-4 rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/50 focus:ring-2 focus:ring-blue-600 transition-all font-medium text-lg shadow-sm"
+                      className="h-12 px-4 rounded-xl border-[#D1D5DB] dark:border-gray-800 bg-white dark:bg-gray-800/50 focus:ring-2 focus:ring-[#3B82F6] transition-all font-medium text-base shadow-sm"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-600 transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -160,7 +160,7 @@ export function LoginScreen() {
 
                 <Button
                   type="submit"
-                  className="w-full h-14 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-500/25 btn-3d animate-slide-up"
+                  className="w-full h-12 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white font-bold text-base shadow-lg shadow-emerald-500/10 btn-3d animate-slide-up tracking-wider"
                   style={{ animationDelay: '0.5s' }}
                   disabled={isLoading}
                 >
@@ -170,7 +170,7 @@ export function LoginScreen() {
                       <span>Verifying...</span>
                     </div>
                   ) : (
-                    'Sign In'
+                    'SIGN IN'
                   )}
                 </Button>
               </form>

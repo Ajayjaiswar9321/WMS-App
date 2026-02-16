@@ -167,6 +167,7 @@ const mockBatches: Batch[] = [
   {
     id: '1',
     batchNumber: 'BATCH-2026-0001',
+    customerName: 'Standard Customer',
     type: 'refurb',
     status: 'completed',
     vehicleNumber: 'MH03CL 8085',
@@ -214,10 +215,30 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       login: async (email: string, password: string) => {
-        // Mock login - accept admin@comprint.in with password 1
-        if (email === 'admin@comprint.in' && password === '1') {
+        if (password !== '123456') return false;
+
+        const roleMap: Record<string, string> = {
+          'admin@user.com': 'ADMIN',
+          'storemanager@gmail.com': 'MIS_WAREHOUSE_EXECUTIVE',
+          'qcuser@gmail.com': 'QC_ENGINEER',
+          'l2engineer@gmail.com': 'L2_ENGINEER',
+          'inward@gmail.com': 'MIS_WAREHOUSE_EXECUTIVE',
+          'outward@gmail.com': 'MIS_WAREHOUSE_EXECUTIVE',
+          'superadmin@gmail.com': 'SUPERADMIN'
+        };
+
+        const roleCode = roleMap[email];
+        if (roleCode) {
+          const role = mockRoles.find(r => r.code === roleCode) || mockRoles[0];
           set({
-            user: mockUsers[0],
+            user: {
+              id: Math.random().toString(36).substr(2, 9),
+              email,
+              name: email.split('@')[0],
+              role,
+              status: 'active',
+              createdAt: new Date().toISOString()
+            },
             isAuthenticated: true
           });
           return true;
@@ -359,20 +380,14 @@ export const useDashboardStats = () => {
   return {
     totalDevices: devices.length,
     pendingInspection: devices.filter(d => d.status === 'pending_inspection').length,
-    underInspection: devices.filter(d => d.status === 'under_inspection').length,
+    inspected: devices.filter(d => d.status === 'inspected').length,
     waitingSpares: devices.filter(d => d.status === 'waiting_spares').length,
-    readyForRepair: devices.filter(d => d.status === 'ready_repair').length,
-    underRepair: devices.filter(d => d.status === 'under_repair').length,
-    inL3Repair: devices.filter(d => d.status === 'in_l3_repair').length,
-    inDisplayRepair: devices.filter(d => d.status === 'in_display_repair').length,
-    inBatteryRepair: devices.filter(d => d.status === 'in_battery_repair').length,
-    inPaintShop: devices.filter(d => d.status === 'in_paint_shop').length,
-    awaitingQC: devices.filter(d => d.status === 'awaiting_qc').length,
-    underQC: devices.filter(d => d.status === 'under_qc').length,
-    qcPassed: devices.filter(d => d.status === 'qc_passed').length,
-    readyStock: devices.filter(d => d.status === 'ready_stock').length,
-    inRepairWorkflow: devices.filter(d =>
+    inPaint: devices.filter(d => d.status === 'in_paint_shop').length,
+    inRepair: devices.filter(d =>
       ['under_repair', 'in_l3_repair', 'in_display_repair', 'in_battery_repair'].includes(d.status)
-    ).length
+    ).length,
+    inQC: devices.filter(d => d.status === 'under_qc' || d.status === 'awaiting_qc').length,
+    readyForStock: devices.filter(d => d.status === 'ready_stock').length,
+    inStock: devices.filter(d => d.status === 'in_stock').length,
   };
 };
