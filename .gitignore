@@ -26,3 +26,7 @@ dist-ssr
 .vercel
 .agent
 .gemini
+
+# Playwright
+playwright-report/
+test-results/
