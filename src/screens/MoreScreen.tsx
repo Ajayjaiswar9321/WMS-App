@@ -472,12 +472,15 @@ export function UsersScreen({ onBack }: { onBack: () => void }) {
   const { users, roles, addUser, updateUser } = useDataStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all'); // Added filter state
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     roleId: '',
     status: 'active' as 'active' | 'inactive'
   });
+
+  const filteredUsers = users.filter(u => statusFilter === 'all' || u.status === statusFilter); // Filter logic
 
   const handleOpenAdd = () => {
     setEditingUser(null);
@@ -537,19 +540,26 @@ export function UsersScreen({ onBack }: { onBack: () => void }) {
       </header>
       <div className="flex-1 overflow-y-auto scrollable-content p-4 pb-24 space-y-4">
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <Card className="mobile-card shadow-3d border-none bg-blue-50/50">
+          <Card
+            className={`mobile-card shadow-3d border-none transition-all cursor-pointer ${statusFilter === 'all' ? 'ring-2 ring-blue-500 bg-blue-50/50' : 'bg-white dark:bg-gray-800'}`}
+            onClick={() => setStatusFilter('all')}
+          >
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-black text-blue-600">{users.length}</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Total Users</p>
             </CardContent>
           </Card>
-          <Card className="mobile-card shadow-3d border-none bg-green-50/50">
+          <Card
+            className={`mobile-card shadow-3d border-none transition-all cursor-pointer ${statusFilter === 'active' ? 'ring-2 ring-green-500 bg-green-50/50' : 'bg-white dark:bg-gray-800'}`}
+            onClick={() => setStatusFilter(statusFilter === 'active' ? 'all' : 'active')}
+          >
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-black text-green-600">{users.filter(u => u.status === 'active').length}</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Active</p>
             </CardContent>
           </Card>
         </div>
+
         <Button
           className="w-full h-14 shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest btn-3d mb-6"
           onClick={handleOpenAdd}
@@ -557,17 +567,18 @@ export function UsersScreen({ onBack }: { onBack: () => void }) {
           <Plus className="w-5 h-5 mr-2" />
           Add New User
         </Button>
-        <div className="space-y-4">
-          {users.map((user) => (
-            <Card key={user.id} className="mobile-card shadow-3d border-none overflow-hidden">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredUsers.map((user) => (
+            <Card key={user.id} className="mobile-card shadow-3d border-none overflow-hidden hover:shadow-lg transition-all">
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center shadow-inner">
+                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center shadow-inner shrink-0">
                     <UserIcon className="w-6 h-6 text-blue-600" />
                   </div>
-                  <div className="flex-1">
-                    <p className="font-black text-gray-900 dark:text-white leading-tight">{user.name}</p>
-                    <p className="text-xs font-medium text-gray-500">{user.email}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-black text-gray-900 dark:text-white leading-tight truncate">{user.name}</p>
+                    <p className="text-xs font-medium text-gray-500 truncate">{user.email}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-none font-bold text-[9px] tracking-widest uppercase py-0.5">
                         {user.role.name}
@@ -580,7 +591,7 @@ export function UsersScreen({ onBack }: { onBack: () => void }) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                    className="h-10 w-10 text-gray-400 hover:text-blue-600 hover:bg-blue-50 shrink-0"
                     onClick={() => handleOpenEdit(user)}
                   >
                     <Edit2 className="w-4 h-4" />
@@ -766,38 +777,61 @@ export function RolesScreen({ onBack }: { onBack: () => void }) {
         </div>
       </header>
       <div className="flex-1 overflow-y-auto scrollable-content p-4 pb-24 space-y-4">
-        <Button
-          className="w-full h-14 shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest btn-3d mb-6"
-          onClick={handleOpenAdd}
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Create New Role
-        </Button>
-        <div className="space-y-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+          <Card className="mobile-card shadow-3d border-none bg-blue-50/50 dark:bg-blue-900/10">
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-black text-blue-600">{roles.length}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Total Roles</p>
+            </CardContent>
+          </Card>
+          <Card className="mobile-card shadow-3d border-none bg-purple-50/50 dark:bg-purple-900/10">
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-black text-purple-600">{roles.filter(r => r.type === 'system').length}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">System</p>
+            </CardContent>
+          </Card>
+          <Card className="mobile-card shadow-3d border-none bg-orange-50/50 dark:bg-orange-900/10">
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-black text-orange-600">{roles.filter(r => r.type === 'custom').length}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Custom</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <Button
+            className="flex-1 h-14 shadow-lg shadow-blue-500/20 font-black uppercase tracking-widest btn-3d"
+            onClick={handleOpenAdd}
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Create New Role
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {roles.map((role) => (
-            <Card key={role.id} className="mobile-card shadow-3d border-none overflow-hidden">
-              <CardContent className="p-5">
+            <Card key={role.id} className="mobile-card shadow-3d border-none overflow-hidden hover:shadow-lg transition-all">
+              <CardContent className="p-5 h-full flex flex-col">
                 <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 ${role.type === 'system' ? 'bg-purple-100' : 'bg-orange-100'} rounded-2xl flex items-center justify-center shadow-inner`}>
+                  <div className={`w-12 h-12 ${role.type === 'system' ? 'bg-purple-100 dark:bg-purple-900/30' : 'bg-orange-100 dark:bg-orange-900/30'} rounded-2xl flex items-center justify-center shadow-inner shrink-0`}>
                     <Shield className={`w-6 h-6 ${role.type === 'system' ? 'text-purple-600' : 'text-orange-600'}`} />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-black text-gray-900 dark:text-white leading-tight">{role.name}</p>
-                      <Badge className="text-[8px] font-black uppercase tracking-widest bg-gray-100 dark:bg-gray-800 text-gray-500 border-none">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <p className="font-black text-gray-900 dark:text-white leading-tight truncate">{role.name}</p>
+                      <Badge className="text-[8px] font-black uppercase tracking-widest bg-gray-100 dark:bg-gray-800 text-gray-500 border-none shrink-0">
                         {role.type}
                       </Badge>
                     </div>
-                    <p className="text-xs text-gray-500 mb-2 leading-relaxed">{role.description}</p>
-                    <code className="text-[10px] font-mono bg-gray-50 dark:bg-gray-900 px-2 py-0.5 rounded text-blue-600">
+                    <p className="text-xs text-gray-500 mb-2 leading-relaxed line-clamp-2">{role.description}</p>
+                    <code className="text-[10px] font-mono bg-gray-50 dark:bg-gray-900 px-2 py-0.5 rounded text-blue-600 inline-block">
                       {role.code}
                     </code>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10 text-gray-400 hover:text-blue-600"
+                      className="h-10 w-10 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
                       onClick={() => handleOpenEdit(role)}
                     >
                       <Edit2 className="w-4 h-4" />

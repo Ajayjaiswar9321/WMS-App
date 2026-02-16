@@ -315,18 +315,21 @@ export function InwardScreen() {
 
         <div className="flex-1 overflow-y-auto scrollable-content p-4 space-y-6">
           {/* Batch Info Card - High Fidelity Matching Screenshot */}
-          <Card className="rounded-[2rem] border-none bg-white dark:bg-gray-800 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.06)] overflow-hidden">
-            <CardContent className="p-6">
+          <Card className="rounded-[2rem] border-none bg-white dark:bg-gray-800 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.06)] overflow-hidden transition-all hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)]">
+            <CardContent className="p-6 md:p-8">
               <div className="flex items-center justify-between mb-8">
-                <Badge className="bg-[#F3E8FF] text-[#7E22CE] border-none px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest">
-                  {selectedBatch.type === 'refurb' ? 'REFURB' : 'RENTAL'}
-                </Badge>
-                <Badge className="bg-[#DCFCE7] text-[#15803D] border-none px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest">
-                  COMPLETED
-                </Badge>
+                <div className="flex gap-2">
+                  <Badge className="bg-[#F3E8FF] text-[#7E22CE] border-none px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                    {selectedBatch.type === 'refurb' ? 'REFURB' : 'RENTAL'}
+                  </Badge>
+                  <Badge className="bg-[#DCFCE7] text-[#15803D] border-none px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                    COMPLETED
+                  </Badge>
+                </div>
+                {/* Desktop-only action buttons could go here */}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 sm:gap-x-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-y-6 gap-x-8">
                 <div className="flex items-center justify-between sm:block space-y-1">
                   <p className="text-[10px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">Vehicle</p>
                   <p className="text-[15px] font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.vehicleNumber || 'MH03CL 8085'}</p>
@@ -356,7 +359,7 @@ export function InwardScreen() {
               {selectedBatch.notes && (
                 <div className="mt-8 pt-6 border-t border-gray-50 dark:border-gray-700/50">
                   <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black mb-1.5">Notes</p>
-                  <p className="text-xs text-[#64748B] dark:text-gray-400 font-medium italic leading-relaxed">
+                  <p className="text-xs text-[#64748B] dark:text-gray-400 font-medium italic leading-relaxed max-w-3xl">
                     "{selectedBatch.notes}"
                   </p>
                 </div>
@@ -396,59 +399,65 @@ export function InwardScreen() {
               </div>
             </div>
 
-            {/* Devices List - Matching Screenshot 2 */}
-            <div className="space-y-4 pb-12">
-              {(batchDevices.length > 0 ? batchDevices : [
-                { id: '1', barcode: 'L-APP-1925', brand: 'Apple', model: 'wsdfg', serialNumber: 'ASDF rgt', status: 'stock_out' },
-                { id: '2', barcode: 'L-DEL-4268', brand: 'Dell', model: 'asdfg', serialNumber: 'WASQ1234', status: 'stock_out' }
-              ]).map((device, index) => (
-                <Card
-                  key={device.id}
-                  className="rounded-[1.5rem] border-none bg-white dark:bg-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] overflow-hidden animate-slide-up"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-[#EFF6FF] dark:bg-blue-900/20 rounded-full flex items-center justify-center shadow-inner">
-                          <Package className="w-6 h-6 text-[#2563EB]" />
-                        </div>
-                        <div>
-                          <h4 className="text-base font-black text-[#111827] dark:text-white leading-none uppercase tracking-tight">
-                            {device.model}
-                          </h4>
-                          <p className="text-[10px] text-[#64748B] font-black mt-1.5 uppercase tracking-wide">
-                            {device.brand} • {device.barcode}
-                          </p>
-                          <p className="text-[10px] text-[#94A3B8] font-black uppercase tracking-widest mt-0.5">{device.serialNumber}</p>
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="border-[#DBEAFE] text-[#2563EB] bg-[#EFF6FF]/50 rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-tighter">
-                        {device.status.replace('_', ' ')}
-                      </Badge>
-                    </div>
 
-                    {/* Outward Dispatch History */}
-                    <div className="mt-4 pt-4 border-t border-gray-50 dark:border-gray-700/50">
-                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Outward Dispatch History</p>
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 flex items-center justify-center">
-                            <Truck className="w-4 h-4 text-emerald-600" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase leading-none">DISPATCHED TO RENTAL</p>
-                              <p className="text-[9px] font-bold text-gray-400">12 FEB 2026</p>
+            {/* Devices List - Matching Screenshot 2 */}
+            <div className="pb-12">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                {(batchDevices.length > 0 ? batchDevices : [
+                  { id: '1', barcode: 'L-APP-1925', brand: 'Apple', model: 'wsdfg', serialNumber: 'ASDF rgt', status: 'stock_out' },
+                  { id: '2', barcode: 'L-DEL-4268', brand: 'Dell', model: 'asdfg', serialNumber: 'WASQ1234', status: 'stock_out' },
+                  { id: '3', barcode: 'L-HP-9988', brand: 'HP', model: 'EliteBook', serialNumber: 'HPEB840', status: 'received' }
+                ]).map((device, index) => (
+                  <Card
+                    key={device.id}
+                    className="rounded-[1.5rem] border-none bg-white dark:bg-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] overflow-hidden animate-slide-up hover:shadow-md transition-all duration-300"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    <CardContent className="p-4 flex flex-col h-full justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-[#EFF6FF] dark:bg-blue-900/20 rounded-full flex items-center justify-center shadow-inner shrink-0 leading-none">
+                              <Package className="w-6 h-6 text-[#2563EB]" />
                             </div>
-                            <p className="text-[10px] text-gray-500 font-medium mt-1">Ref: DIS-2026-0045 • HP EliteBook 840 G8</p>
+                            <div>
+                              <h4 className="text-base font-black text-[#111827] dark:text-white leading-none uppercase tracking-tight truncate max-w-[150px]">
+                                {device.model}
+                              </h4>
+                              <p className="text-[10px] text-[#64748B] font-black mt-1.5 uppercase tracking-wide">
+                                {device.brand} • {device.barcode}
+                              </p>
+                              <p className="text-[10px] text-[#94A3B8] font-black uppercase tracking-widest mt-0.5">{device.serialNumber}</p>
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="border-[#DBEAFE] text-[#2563EB] bg-[#EFF6FF]/50 rounded-lg px-2.5 py-1 text-[9px] font-black uppercase tracking-tighter shrink-0 whitespace-nowrap">
+                            {device.status.replace('_', ' ')}
+                          </Badge>
+                        </div>
+
+                        {/* Outward Dispatch History */}
+                        <div className="mt-auto border-t border-gray-50 dark:border-gray-700/50 pt-4">
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Outward Dispatch History</p>
+                          <div className="space-y-3">
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 flex items-center justify-center shrink-0">
+                                <Truck className="w-4 h-4 text-emerald-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase leading-none truncate">DISPATCHED TO RENTAL</p>
+                                  <p className="text-[9px] font-bold text-gray-400 shrink-0">12 FEB</p>
+                                </div>
+                                <p className="text-[10px] text-gray-500 font-medium mt-1 truncate">Ref: DIS-2026-0045</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           </div>
         </div>
