@@ -328,26 +328,26 @@ export function InwardScreen() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 sm:gap-x-8">
                 <div className="flex items-center justify-between sm:block space-y-1">
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">Vehicle</p>
-                  <p className="text-sm font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.vehicleNumber || 'MH03CL 8085'}</p>
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">Vehicle</p>
+                  <p className="text-[15px] font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.vehicleNumber || 'MH03CL 8085'}</p>
                 </div>
                 <div className="flex items-center justify-between sm:block space-y-1 border-t sm:border-none pt-2 sm:pt-0 border-gray-50">
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">Driver</p>
-                  <p className="text-sm font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.driverName || 'Sameer'}</p>
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">Driver</p>
+                  <p className="text-[15px] font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.driverName || 'Sameer'}</p>
                 </div>
                 <div className="flex items-center justify-between sm:block space-y-1 border-t sm:border-none pt-2 sm:pt-0 border-gray-50">
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">PO Number</p>
-                  <p className="text-sm font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.poNumber || 'N/A'}</p>
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">PO Number</p>
+                  <p className="text-[15px] font-black text-[#111827] dark:text-white uppercase tracking-tight">{selectedBatch.poNumber || 'N/A'}</p>
                 </div>
                 <div className="flex items-center justify-between sm:block space-y-1 border-t sm:border-none pt-2 sm:pt-0 border-gray-50">
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">PO Attachment</p>
-                  <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tight truncate">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">PO Attachment</p>
+                  <p className="text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tight truncate">
                     {selectedBatch.poAttachmentUrl ? <span className="underline cursor-pointer">View Attachment</span> : 'No File'}
                   </p>
                 </div>
                 <div className="flex items-center justify-between sm:block space-y-1 border-t sm:border-none pt-2 sm:pt-0 border-gray-50">
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">Date</p>
-                  <p className="text-sm font-black text-[#111827] dark:text-white uppercase tracking-tight">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-[#94A3B8] font-black">Date</p>
+                  <p className="text-[15px] font-black text-[#111827] dark:text-white uppercase tracking-tight">
                     {new Date(selectedBatch.batchDate).toLocaleDateString('en-GB')}
                   </p>
                 </div>
@@ -383,7 +383,7 @@ export function InwardScreen() {
                     onClick={() => document.getElementById('excel-upload')?.click()}
                   >
                     <Upload className="w-3.5 h-3.5 mr-2 text-gray-400" />
-                    Bulk
+                    Bulk Upload
                   </Button>
                 </div>
                 <Button
