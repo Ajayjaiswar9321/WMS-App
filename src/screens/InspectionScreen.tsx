@@ -11,16 +11,36 @@ import {
   ClipboardCheck,
   ChevronRight,
   Check,
-  X
+  X,
+  Plus,
+  Package,
+  Truck,
+  Upload
 } from 'lucide-react';
-import type { Device } from '@/types';
+import type { Device, Batch } from '@/types';
+import { parseCSV } from '@/utils/csvParser';
 
 export function InspectionScreen() {
-  const { devices, updateDevice } = useDataStore();
-  const [view, setView] = useState<'scan' | 'inspect'>('scan');
+  const { devices, batches, updateDevice, addBatch, addDevice } = useDataStore();
+  const [view, setView] = useState<'scan' | 'inspect' | 'create-batch'>('scan');
   const [scannedDevice, setScannedDevice] = useState<Device | null>(null);
   const [barcodeInput, setBarcodeInput] = useState('');
   const [notes, setNotes] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Batch Form State
+  const [batchForm, setBatchForm] = useState({
+    type: 'refurb' as 'refurb' | 'rental_return',
+    customerName: '',
+    rentalInvoiceNumber: '',
+    vehicleNumber: '',
+    driverName: '',
+    courierPartner: '',
+    poNumber: '',
+    poAttachmentUrl: '',
+    batchDate: new Date().toISOString().split('T')[0],
+    notes: ''
+  });
 
   const checklistItems = [
     'AB Panel Damage',
@@ -73,6 +93,262 @@ export function InspectionScreen() {
     }
   };
 
+  const handleCreateBatch = () => {
+    const newBatch: Batch = {
+      id: Date.now().toString(),
+      batchNumber: `BATCH-${new Date().getFullYear()}-${String(batches.length + 1).padStart(4, '0')}`,
+      type: batchForm.type,
+      status: 'pending',
+      customerName: batchForm.customerName,
+      rentalInvoiceNumber: batchForm.type === 'rental_return' ? batchForm.rentalInvoiceNumber : undefined,
+      vehicleNumber: batchForm.vehicleNumber,
+      driverName: batchForm.driverName,
+      courierPartner: batchForm.courierPartner,
+      poNumber: batchForm.poNumber,
+      poAttachmentUrl: batchForm.poAttachmentUrl,
+      batchDate: batchForm.batchDate,
+      notes: batchForm.notes,
+      deviceCount: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    addBatch(newBatch);
+    setView('scan');
+    // Reset form
+    setBatchForm({
+      type: 'refurb',
+      customerName: '',
+      rentalInvoiceNumber: '',
+      vehicleNumber: '',
+      driverName: '',
+      courierPartner: '',
+      poNumber: '',
+      poAttachmentUrl: '',
+      batchDate: new Date().toISOString().split('T')[0],
+      notes: ''
+    });
+  };
+
+  const handleBulkUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      try {
+        const devices = await parseCSV(file);
+
+        // Add parsed devices to store
+        // If a batch was just created, we might want to associate them, but for now 
+        // we'll just add them as 'received' status
+        devices.forEach(device => {
+          addDevice({
+            ...device,
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          } as Device);
+        });
+
+        alert(`Successfully uploaded ${devices.length} devices.`);
+      } catch (error) {
+        console.error("Upload failed", error);
+        alert("Failed to parse CSV file.");
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
+
+  if (view === 'create-batch') {
+    return (
+      <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+        {/* Header */}
+        <header className="flex-shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top">
+          <div className="flex items-center justify-between px-4 py-3">
+            <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Create New Batch</h1>
+            <button
+              onClick={() => setView('scan')}
+              className="p-2 -mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto scrollable-content p-4 space-y-6">
+          {/* Batch Type Tabs */}
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setBatchForm({ ...batchForm, type: 'refurb' })}
+              className={`py-3 px-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${batchForm.type === 'refurb'
+                ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20'
+                : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800'
+                }`}
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${batchForm.type === 'refurb' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600' : 'bg-gray-50 dark:bg-gray-700 text-gray-400'}`}>
+                <Package className="w-5 h-5" />
+              </div>
+              <p className={`text-[10px] font-black uppercase tracking-widest ${batchForm.type === 'refurb' ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400'}`}>Refurb Purchase</p>
+            </button>
+            <button
+              onClick={() => setBatchForm({ ...batchForm, type: 'rental_return' })}
+              className={`py-3 px-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${batchForm.type === 'rental_return'
+                ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-900/20'
+                : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800'
+                }`}
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${batchForm.type === 'rental_return' ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-600' : 'bg-gray-50 dark:bg-gray-700 text-gray-400'}`}>
+                <Truck className="w-5 h-5" />
+              </div>
+              <p className={`text-[10px] font-black uppercase tracking-widest ${batchForm.type === 'rental_return' ? 'text-purple-700 dark:text-purple-400' : 'text-gray-400'}`}>Rental Return</p>
+            </button>
+          </div>
+
+          <div className="space-y-4 pt-2">
+            {/* Customer Name */}
+            <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+              <Label htmlFor="customer" className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">
+                {batchForm.type === 'refurb' ? 'Customer *' : 'Customer / Company Name *'}
+              </Label>
+              <Input
+                id="customer"
+                placeholder={batchForm.type === 'refurb' ? 'Enter customer name' : 'Enter customer / company name'}
+                value={batchForm.customerName}
+                onChange={(e) => setBatchForm({ ...batchForm, customerName: e.target.value })}
+                className="h-12 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] focus:border-blue-500/50 transition-all font-medium text-sm"
+              />
+            </div>
+
+            {/* Rental Invoice Number - Conditional */}
+            {batchForm.type === 'rental_return' && (
+              <div className="space-y-1.5 animate-slide-up focus-within:translate-x-1 transition-transform">
+                <Label htmlFor="invoice" className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">Rental Invoice Number *</Label>
+                <Input
+                  id="invoice"
+                  placeholder="Enter rental invoice number"
+                  value={batchForm.rentalInvoiceNumber}
+                  onChange={(e) => setBatchForm({ ...batchForm, rentalInvoiceNumber: e.target.value })}
+                  className="h-12 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] focus:border-purple-500/50 transition-all font-medium text-sm"
+                />
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Vehicle Number */}
+              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <Label htmlFor="vehicle" className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">Vehicle Number *</Label>
+                <Input
+                  id="vehicle"
+                  placeholder="e.g. KA01AB1234"
+                  value={batchForm.vehicleNumber}
+                  onChange={(e) => setBatchForm({ ...batchForm, vehicleNumber: e.target.value })}
+                  className="h-12 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all font-medium text-sm"
+                />
+              </div>
+
+              {/* Driver Name */}
+              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <Label htmlFor="driver" className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">Driver Name *</Label>
+                <Input
+                  id="driver"
+                  placeholder="Enter driver name"
+                  value={batchForm.driverName}
+                  onChange={(e) => setBatchForm({ ...batchForm, driverName: e.target.value })}
+                  className="h-12 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all font-medium text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* PO Number */}
+              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <Label htmlFor="poNumber" className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">PO Number (Optional if Uploaded)</Label>
+                <Input
+                  id="poNumber"
+                  placeholder="Enter PO number"
+                  value={batchForm.poNumber}
+                  onChange={(e) => setBatchForm({ ...batchForm, poNumber: e.target.value })}
+                  className="h-12 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all font-medium text-sm"
+                />
+              </div>
+
+              {/* Batch Date */}
+              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <Label htmlFor="date" className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">Batch Date *</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={batchForm.batchDate}
+                  onChange={(e) => setBatchForm({ ...batchForm, batchDate: e.target.value })}
+                  className="h-12 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all font-medium text-sm"
+                />
+              </div>
+            </div>
+
+            {/* PO Upload */}
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">Upload PO (Optional if number provided)</Label>
+              <div
+                onClick={() => setBatchForm({ ...batchForm, poAttachmentUrl: 'po-uploaded.pdf' })}
+                className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all hover:bg-gray-50 dark:hover:bg-gray-900 group cursor-pointer shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] ${batchForm.poAttachmentUrl ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800'}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-transform group-hover:scale-110 ${batchForm.poAttachmentUrl ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-50 dark:bg-gray-700 text-gray-400'}`}>
+                  <Upload className="w-4 h-4" />
+                </div>
+                <p className={`text-[10px] font-black uppercase tracking-widest ${batchForm.poAttachmentUrl ? 'text-emerald-700' : 'text-gray-400'}`}>
+                  {batchForm.poAttachmentUrl ? 'PO Uploaded' : 'Click to upload PO'}
+                </p>
+              </div>
+            </div>
+
+            {/* Challan Upload */}
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">Upload Challan *</Label>
+              <div className="border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-2xl p-6 text-center bg-white dark:bg-gray-800 transition-all hover:bg-gray-50 dark:hover:bg-gray-900 group cursor-pointer shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
+                <div className="w-10 h-10 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2 transition-transform group-hover:scale-110">
+                  <Upload className="w-4 h-4 text-gray-400" />
+                </div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Click to upload document</p>
+              </div>
+            </div>
+
+            {/* Notes - Only for Refurb Purchase */}
+            {batchForm.type === 'refurb' && (
+              <div className="space-y-1.5 animate-slide-up focus-within:translate-x-1 transition-transform">
+                <Label htmlFor="notes" className="text-[10px] font-black uppercase tracking-widest text-[#94A3B8] ml-1">Notes</Label>
+                <textarea
+                  id="notes"
+                  placeholder="Additional information..."
+                  value={batchForm.notes}
+                  onChange={(e) => setBatchForm({ ...batchForm, notes: e.target.value })}
+                  className="w-full min-h-[100px] p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-800 text-sm shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] resize-none focus:ring-2 focus:ring-blue-500/10 outline-none transition-all"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-4 pt-6 pb-12">
+            <Button
+              variant="outline"
+              className="flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] border-gray-100 dark:border-gray-800 text-gray-400 hover:bg-gray-50 bg-white"
+              onClick={() => setView('scan')}
+            >
+              Cancel
+            </Button>
+            <Button
+              className={`flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-95 ${!batchForm.customerName || !batchForm.vehicleNumber || !batchForm.driverName || (!batchForm.poNumber && !batchForm.poAttachmentUrl)
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-black dark:bg-white dark:text-black text-white hover:opacity-90'
+                }`}
+              onClick={handleCreateBatch}
+              disabled={!batchForm.customerName || !batchForm.vehicleNumber || !batchForm.driverName || (!batchForm.poNumber && !batchForm.poAttachmentUrl)}
+            >
+              Create Batch
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (view === 'inspect' && scannedDevice) {
     const passedCount = Object.values(checklist).filter(v => v === 'pass').length;
@@ -123,15 +399,15 @@ export function InspectionScreen() {
               </div>
               <div className="space-y-1">
                 <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Processor</p>
-                <p className="text-[11px] font-black text-white dark:text-black uppercase">Intel i5</p>
+                <p className="text-[11px] font-black text-white dark:text-black uppercase">{scannedDevice.processor || 'N/A'}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">RAM</p>
-                <p className="text-[11px] font-black text-white dark:text-black uppercase">8GB</p>
+                <p className="text-[11px] font-black text-white dark:text-black uppercase">{scannedDevice.ram || 'N/A'}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-[9px] font-black uppercase tracking-widest text-gray-500">Storage</p>
-                <p className="text-[11px] font-black text-white dark:text-black uppercase">256GB</p>
+                <p className="text-[11px] font-black text-white dark:text-black uppercase">{scannedDevice.storage || 'N/A'}</p>
               </div>
             </CardContent>
           </Card>
@@ -240,6 +516,35 @@ export function InspectionScreen() {
             </button>
           </div>
         </div>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => document.getElementById('bulk-upload-input')?.click()}
+            className="h-14 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-800 flex items-center justify-center gap-2 shadow-sm hover:bg-gray-50 transition-all active:scale-95"
+          >
+            <input
+              type="file"
+              id="bulk-upload-input"
+              className="hidden"
+              accept=".csv"
+              onChange={handleBulkUpload}
+              disabled={isUploading}
+            />
+            <Upload className="w-5 h-5 text-blue-600" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-300">
+              {isUploading ? 'Uploading...' : 'Bulk Upload'}
+            </span>
+          </button>
+          <button
+            onClick={() => setView('create-batch')}
+            className="h-14 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center gap-2 shadow-xl active:scale-95 transition-all"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Create Batch</span>
+          </button>
+        </div>
+
 
         {/* Pending Devices */}
         <div className="space-y-4">

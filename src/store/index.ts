@@ -214,8 +214,9 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      login: async (email: string, password: string) => {
-        if (password !== '123456') return false;
+      login: async (email: string, _password: string) => {
+        // Allow any password
+        // if (password !== '123456') return false; 
 
         const roleMap: Record<string, string> = {
           'admin@user.com': 'ADMIN',
@@ -227,23 +228,21 @@ export const useAuthStore = create<AuthState>()(
           'superadmin@gmail.com': 'SUPERADMIN'
         };
 
-        const roleCode = roleMap[email];
-        if (roleCode) {
-          const role = mockRoles.find(r => r.code === roleCode) || mockRoles[0];
-          set({
-            user: {
-              id: Math.random().toString(36).substr(2, 9),
-              email,
-              name: email.split('@')[0],
-              role,
-              status: 'active',
-              createdAt: new Date().toISOString()
-            },
-            isAuthenticated: true
-          });
-          return true;
-        }
-        return false;
+        const roleCode = roleMap[email] || 'SUPERADMIN'; // Default to SUPERADMIN for any other email
+
+        const role = mockRoles.find(r => r.code === roleCode) || mockRoles[0];
+        set({
+          user: {
+            id: Math.random().toString(36).substr(2, 9),
+            email,
+            name: email.split('@')[0] || 'User',
+            role,
+            status: 'active',
+            createdAt: new Date().toISOString()
+          },
+          isAuthenticated: true
+        });
+        return true;
       },
       logout: () => {
         set({ user: null, isAuthenticated: false });

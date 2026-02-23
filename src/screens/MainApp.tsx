@@ -6,6 +6,7 @@ import { RepairScreen } from '@/screens/RepairScreen';
 import { InventoryScreen } from '@/screens/InventoryScreen';
 import { MoreScreen, PaintShopScreen, QCScreen, OutwardScreen, UsersScreen, RolesScreen, SettingsScreen } from '@/screens/MoreScreen';
 import { SparesScreen } from '@/screens/SparesScreen';
+import { Logo } from '@/components/Logo';
 import {
   LayoutDashboard,
   Package,
@@ -14,9 +15,9 @@ import {
   Boxes,
   Paintbrush,
   ShieldCheck,
-  UserCog, // Re-added missing import
+  UserCog,
   LogOut,
-  Truck, // Updated icon
+  Truck,
   User,
   MoreHorizontal
 } from 'lucide-react';
@@ -67,7 +68,15 @@ export function MainApp() {
       <aside className="w-72 flex-shrink-0 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col hidden lg:flex">
         <div className="p-8">
           <div className="flex flex-col items-center gap-2 mb-10">
-            <img src="/logo.png" alt="COMPRINT" className="h-16 w-auto object-contain" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                <Logo className="w-6 h-6 text-white" variant="light" />
+              </div>
+              <div>
+                <h1 className="text-xl font-black tracking-tight text-gray-900 dark:text-white leading-none">COMPRINT</h1>
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Management</p>
+              </div>
+            </div>
           </div>
 
           <nav className="space-y-1">

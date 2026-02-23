@@ -1,5 +1,6 @@
 import { useDashboardStats, useUIStore } from '@/store';
 import { Card, CardContent } from '@/components/ui/card';
+import { Logo } from '@/components/Logo';
 import {
   ClipboardCheck,
   Boxes,
@@ -89,7 +90,10 @@ export function DashboardScreen() {
       <header className="flex-shrink-0 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 lg:hidden safe-area-top">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="COMPRINT" className="h-12 w-auto object-contain" />
+            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-md shadow-emerald-500/20">
+              <Logo className="w-5 h-5 text-white" variant="light" />
+            </div>
+            <span className="text-lg font-black tracking-tight text-gray-900 dark:text-white leading-none">COMPRINT</span>
           </div>
           <div className="flex items-center gap-1">
             {/* Refresh removed as requested */}
