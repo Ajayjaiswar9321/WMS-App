@@ -4,7 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Package, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Logo } from '@/components/Logo';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -71,7 +72,7 @@ export function LoginScreen() {
           {/* Logo with 3D context */}
           <div className="relative group perspective-1000 mb-4">
             <div className={`w-20 h-20 bg-emerald-600 rounded-[1.5rem] flex items-center justify-center mx-auto shadow-3d animate-float transition-all duration-500 ${isLoading ? 'animate-pulse scale-110' : ''}`}>
-              <Package className="w-10 h-10 text-white" />
+              <Logo className="w-10 h-10 text-white" variant="light" />
             </div>
           </div>
 
@@ -130,17 +131,16 @@ export function LoginScreen() {
 
                 <div className="space-y-2 animate-slide-up" style={{ animationDelay: '0.4s' }}>
                   <Label htmlFor="password" className="text-sm font-semibold text-[#374151] dark:text-gray-200 uppercase tracking-wider">
-                    Password
+                    Password (Optional)
                   </Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="Enter your password"
+                      placeholder="Enter any password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="h-12 px-4 rounded-xl border-[#D1D5DB] dark:border-gray-800 bg-white dark:bg-gray-800/50 focus:ring-2 focus:ring-[#3B82F6] transition-all font-medium text-base shadow-sm"
-                      required
                     />
                     <button
                       type="button"

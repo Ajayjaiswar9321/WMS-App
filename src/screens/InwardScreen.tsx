@@ -18,7 +18,7 @@ import {
   User,
   FileText
 } from 'lucide-react';
-import type { Batch } from '@/types';
+import type { Batch, Device } from '@/types';
 
 export function InwardScreen() {
   const { batches, devices, addBatch, addDevice } = useDataStore();
@@ -283,10 +283,28 @@ export function InwardScreen() {
   if (view === 'detail' && selectedBatch) {
     const batchDevices = devices.filter(d => d.batchId === selectedBatch.id);
 
-    const handleBulkUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleBulkUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
-        alert(`Successfully uploaded ${file.name}. Processing Excel data...`);
+        try {
+          const devices = await import('@/utils/csvParser').then(m => m.parseCSV(file));
+
+          devices.forEach(device => {
+            addDevice({
+              ...device,
+              id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+              batchId: selectedBatch.id,
+              status: 'received',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            } as Device);
+          });
+
+          alert(`Successfully uploaded ${devices.length} devices to batch ${selectedBatch.batchNumber}.`);
+        } catch (error) {
+          console.error("Upload failed", error);
+          alert("Failed to parse CSV file.");
+        }
       }
     };
 
